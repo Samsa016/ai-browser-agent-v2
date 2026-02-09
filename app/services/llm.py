@@ -1,6 +1,6 @@
 import base64
 from openai import AsyncOpenAI
-from models import AgentAction
+from app.services.models import AgentAction
 from app.config import settings
 
 class LLMService:

@@ -1,16 +1,16 @@
+import asyncio
 import sys
-from app.config import settings
+from app.agent import BrowserAgent
 
-def main():
-    print("Инициализация Агента V2...")
-    
-    try:
-        print(f"Конфигурация OK.")
-        print(f"API Key: ...{settings.openai_api_key[-4:]}")
-        print(f"Браузер: {'Headless' if settings.headless else 'Headful'}")
-    except Exception as e:
-        print(f"Ошибка старта: {e}")
-        sys.exit(1)
+async def main():
+    agent = BrowserAgent()
+    task = str(input("Введите вашу задачу: "))
+    await agent.run(task)
 
 if __name__ == "__main__":
-    main()
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        print("\n Принудительная остановка.")
+    except Exception as e:
+        print(f"\n Ошибка: {e}")

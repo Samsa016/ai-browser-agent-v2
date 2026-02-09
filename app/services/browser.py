@@ -28,6 +28,11 @@ class BrowserService:
         if self.page:
             await self.page.goto(url)
     
+    async def mark_page(self) -> int:
+        with open("app/scripts/mark_page.js", "r", encoding="utf-8") as f:
+            js_code = f.read()
+        return await self.page.evaluate(js_code)
+    
     async def stop(self):
         await self.context.storage_state(path=settings.session_file)
         await self.page.close()
@@ -35,3 +40,4 @@ class BrowserService:
         await self.browser.close()
         await self.playwright.stop()
         
+    
