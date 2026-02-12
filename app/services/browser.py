@@ -33,6 +33,19 @@ class BrowserService:
             js_code = f.read()
         return await self.page.evaluate(js_code)
     
+    async def check_new_page(self):
+        current_pages = self.context.pages
+        
+        if len(current_pages) > 1:
+            new_page = current_pages[-1]
+            
+            if new_page != self.page:
+                self.page = new_page
+                await self.page.bring_to_front()
+                await self.page.wait_for_load_state("domcontentloaded")
+                
+                print("Переключаемся на новую вкладку...")
+    
     async def stop(self):
         await self.context.storage_state(path=settings.session_file)
         await self.page.close()

@@ -1,46 +1,49 @@
 (function() {
-    document.querySelectorAll(".ai-label").forEach(el => el.remove());
+
+    document.querySelectorAll('.ai-mark-container').forEach(el => el.remove());
     
-    window.aiElements = {}; 
-    let counter = 0;
-    const selector = "button, a, input, textarea, select, [role='button'], [onclick]";
-    const elements = document.querySelectorAll(selector);
+    window.aiElements = [];
+    const elements = document.querySelectorAll('button, a, input, textarea, select, [role="button"]');
+    
+    let count = 0;
+    const items = [];
 
-    elements.forEach(el => {
+    elements.forEach((el) => {
         const rect = el.getBoundingClientRect();
+        if (rect.width < 10 || rect.height < 10 || rect.top < 0) return;
         
-        if (rect.width === 0 || rect.height === 0 || window.getComputedStyle(el).visibility === "hidden") {
-            return;
-        }
+        const style = window.getComputedStyle(el);
+        if (style.visibility === 'hidden' || style.display === 'none') return;
 
-        if (rect.bottom < 0 || rect.top > window.innerHeight || rect.right < 0 || rect.left > window.innerWidth) {
-            return; 
-        }
-
-        counter++;
-
-        const label = document.createElement("div");
-        label.className = "ai-label";
-        label.textContent = counter;
+        const mark = document.createElement('div');
+        mark.className = 'ai-mark-container';
+        mark.style.position = 'absolute';
+        mark.style.left = window.scrollX + rect.left + 'px';
+        mark.style.top = window.scrollY + rect.top + 'px';
+        mark.style.width = rect.width + 'px';
+        mark.style.height = rect.height + 'px';
+        mark.style.border = '2px solid red';
+        mark.style.zIndex = '999999';
+        mark.style.pointerEvents = 'none'; 
         
-        Object.assign(label.style, {
-            position: "absolute",
-            left: (window.scrollX + rect.left) + "px",
-            top: (window.scrollY + rect.top) + "px",
-            backgroundColor: "#ff0000",
-            color: "white",
-            padding: "2px 4px",
-            fontSize: "12px",
-            fontWeight: "bold",
-            borderRadius: "2px",
-            zIndex: "2147483647",
-            pointerEvents: "none"
-        });
-
-        document.body.appendChild(label);
+        const label = document.createElement('div');
+        label.innerText = count;
+        label.style.position = 'absolute';
+        label.style.top = '-15px';
+        label.style.left = '0';
+        label.style.background = 'red';
+        label.style.color = 'white';
+        label.style.fontSize = '12px';
+        label.style.padding = '2px';
+        label.style.fontWeight = 'bold';
         
-        window.aiElements[counter] = el;
+        mark.appendChild(label);
+        document.body.appendChild(mark);
+
+        items.push(el);
+        count++;
     });
-
-    return counter;
+    window.aiElements = items;
+    
+    return count;
 })();
