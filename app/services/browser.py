@@ -12,13 +12,14 @@ class BrowserService:
         self.playwright = await async_playwright().start()
         self.browser = await self.playwright.chromium.launch(headless=settings.headless)
         storage_path = Path(settings.session_file)
-        
+        viewport_settings = {"width": 1280, "height": 800}
+
         if storage_path.exists():
             print("Загружаю сессию...")
-            self.context = await self.browser.new_context(storage_state=settings.session_file)
+            self.context = await self.browser.new_context(storage_state=settings.session_file, viewport=viewport_settings)
         else:
             print("Новая сессия...")
-            self.context = await self.browser.new_context()
+            self.context = await self.browser.new_context(viewport=viewport_settings)
 
         self.page = await self.context.new_page()
 

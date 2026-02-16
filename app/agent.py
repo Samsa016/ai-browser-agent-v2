@@ -40,8 +40,6 @@ class BrowserAgent:
 
                 print(f"Мысль: {action.reasoning}")
                 print(f"Действие: {action.action_type} -> ID {action.element_id}")
-                history.append(f"Action: {action.action_type} ID: {action.element_id}, Reason: {action.reasoning}")
-
                 current_log = f"Action: {action.action_type}, ID: {action.element_id}"
                 
                 if action.action_type == "finish":
@@ -65,13 +63,33 @@ class BrowserAgent:
                             text_to_type = query
 
                         await self.browser.page.evaluate(f"window.aiElements[{action.element_id}].click()")
-                        await self.browser.page.keyboard.type(action.text_input or "")
+                        await self.browser.page.keyboard.type(text_to_type)
                         await self.browser.page.keyboard.press("Enter")
                         current_log += f", Content: '{text_to_type}'"
 
                 elif action.action_type == 'scroll':
                     await self.browser.page.mouse.wheel(0, 500)
+                
+                elif action.action_type == 'goto':
+                    if action.url:
+                        print(f"Переходим по URL: {action.url}")
+                        await self.browser.goto(action.url)
+                        current_log += f"Navigated to {action.url}"
+                    else:
+                        print("⚠️ AI хотел перейти, но не дал URL.")
+                
+                elif action.action_type == "extract":
 
+                    if not action.extracted_content:
+                        print("AI хотел хотел сохранить пустоту")
+                        current_log += "Error: Cannot save empty data"
+                    else:
+                        with open("result.txt", "a", encoding="utf-8") as file:
+                            file.write(f"--- DATA FOUND ---\n{action.extracted_content}\n------------------\n")
+                        print("Данные сохранены!")
+                        shorted_extracted = action.extracted_content[:50].replace("\n", " ")
+                        current_log += f"SUCCESS: Saved data '{shorted_extracted}...'"
+                            
                 elif action.action_type == 'wait':
                         input("⏸️ Бот на паузе. Реши проблему в браузере и нажми Enter...")
                     
